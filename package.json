@@ -1,0 +1,20 @@
+{
+  "name": "kaspa-wallet-worker",
+  "version": "0.0.1",
+  "description": "Worker (node + browser) wrapping kaspa-wallet",
+  "main": "dist/index.js",
+  "author": "Kaspa Developers",
+  "license": "ISC",
+  "scripts": {
+    "build": "tsc",
+    "watch": "tsc --watch",
+    "prepare": "npm run build"
+  },
+  "dependencies": {
+    "@types/node": "^14.14.9",
+    "kaspa-wallet": "file:../kaspa-wallet",
+    "web-worker":"*",
+    "ts-node": "^9.0.0",
+    "typescript": "*"
+  }
+}
