@@ -76,8 +76,8 @@ class WalletWrapper extends EventTargetImpl{
 					return this.handleReady(data);
 				case 'rpc-request':
 					return this.handleRPCRequest(data);
-				case 'wallet-responce':
-					return this.handleResponce(data);
+				case 'wallet-response':
+					return this.handleResponse(data);
 				case 'wallet-events':
 					return this.handleEvents(data);
 			}
@@ -97,7 +97,7 @@ class WalletWrapper extends EventTargetImpl{
 		this.emit("worker-ready");
 	}
 
-	async handleResponce(msg:{rid:string, error?:any, result?:any}){
+	async handleResponse(msg:{rid:string, error?:any, result?:any}){
 		let {rid, error, result} = msg;
 		let item:CBItem|undefined = this._pendingCB.get(rid);
 		if(!item)

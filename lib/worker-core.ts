@@ -110,6 +110,6 @@ export class WorkerCore extends EventEmitter{
 	}
 
 	sendWalletResponse(rid:string, error:any=undefined, result:any=undefined){
-		this.postMessage("wallet-responce", {rid, error, result});
+		this.postMessage("wallet-response", {rid, error, result});
 	}
 }
