@@ -125,7 +125,7 @@ class WalletWrapper extends EventTargetImpl{
 		}
 
 
-		if(fn=='request' && /^notify/.test(args[0])){
+		if(fn=='subscribe'){
 			args.push((result:any)=>{
 				this.postMessage("rpc-publish", {method:args[0], rid, result})
 			})

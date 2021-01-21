@@ -67,7 +67,7 @@ export class Client{
 		this.core.postMessage("rpc-request", {fn, args, rid})
 	}
 
-	call(method:string, data:any={}){
+	call(method:string, data:any={}, type:string="request"){
 		return new Promise((resolve, reject)=>{
 			let rid = UID();
 			this.pending.set(rid, {
@@ -78,7 +78,7 @@ export class Client{
 					resolve(result);
 				}
 			})
-			this.req('request', [method, data], rid);
+			this.req(type, [method, data], rid);
 		})
 	}
 
@@ -115,7 +115,7 @@ export class Client{
 		let uid = UID();
 		subscribers.push({uid, callback});
 
-		let p = this.call(subject, data) as Rpc.SubPromise<T>;
+		let p = this.call(subject, data, "subscribe") as Rpc.SubPromise<T>;
 
 		p.uid = uid;
 		return p;
