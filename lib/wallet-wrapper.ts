@@ -35,6 +35,7 @@ class WalletWrapper extends EventTargetImpl{
 	syncSignal:helper.DeferredPromise|undefined;
 	workerReady:helper.DeferredPromise = helper.Deferred();
 	balance:{available:number, pending:number, total:number} = {available:0, pending:0, total:0};
+	_rid2subUid:Map<string, string> = new Map();
 
 	constructor(privKey: string, seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}){
 		super();
@@ -109,6 +110,17 @@ class WalletWrapper extends EventTargetImpl{
 	async handleRPCRequest(msg:{fn:string, args:any, rid?:string}){
 		const {fn, args, rid} = msg;
 
+		if(fn=="unSubscribe"){
+			if(args[1]){
+				args[1] = this._rid2subUid.get(args[1]);//rid to subid
+				if(!args[1])
+					return
+			}
+			//@ts-ignore
+			this.rpc.unSubscribe(...args);
+			return
+		}
+
 		let directFns = [
 			'onConnect', 'onDisconnect', 'onConnectFailure', 'onError', 'disconnect'
 		];
@@ -140,7 +152,11 @@ class WalletWrapper extends EventTargetImpl{
 			error = err;
 		});
 
-		this.postMessage("rpc-response", {rid, subUid, result, error})
+		if(fn=='subscribe' && rid){
+			this._rid2subUid.set(rid, subUid);
+		}
+
+		this.postMessage("rpc-response", {rid, result, error})
 	}
 
 	postMessage(op:string, data:any){
