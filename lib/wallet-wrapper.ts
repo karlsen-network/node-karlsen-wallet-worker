@@ -17,6 +17,8 @@ import {
 class WalletWrapper extends EventTargetImpl{
 	
 	static networkTypes=Wallet.networkTypes;
+	static KSP=Wallet.KSP;
+	static networkAliases=Wallet.networkAliases;
 	static fromMnemonic(seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}): WalletWrapper {
 		if (!networkOptions || !networkOptions.network)
 			throw new Error(`fromMnemonic(seedPhrase,networkOptions): missing network argument`);
@@ -32,6 +34,7 @@ class WalletWrapper extends EventTargetImpl{
 	_pendingCB:Map<string, CBItem> = new Map();
 	syncSignal:helper.DeferredPromise|undefined;
 	workerReady:helper.DeferredPromise = helper.Deferred();
+	balance:{available:number, pending:number, total:number} = {available:0, pending:0, total:0};
 
 	constructor(privKey: string, seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}){
 		super();
@@ -83,7 +86,11 @@ class WalletWrapper extends EventTargetImpl{
 	}
 
 	handleEvents(msg:{name:string, data:any}){
-		this.emit(msg.name, msg.data);
+		let {name, data} = msg;
+		if(name == 'balance-update'){
+			this.balance = data;
+		}
+		this.emit(name, data);
 	}
 	handleReady(data:any=undefined){
 		this.workerReady.resolve()
