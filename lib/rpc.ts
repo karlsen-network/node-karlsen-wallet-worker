@@ -1,12 +1,12 @@
 import {IRPC, RPC as Rpc, SubscriberItem, SubscriberItemMap} from '../types/custom-types';
-import {WorkerCore} from './core';
-type CBItem = {uid?:string, cb:Function};
-const UID = ()=>(Math.random()*100000).toFixed(0)+Date.now();
+import {WorkerCore} from './worker-core';
+export type CBItem = {uid?:string, cb:Function};
+export const UID = ()=>(Math.random()*100000).toFixed(0)+Date.now();
 
 export {IRPC};
 
 export class Client{
-	callbacks:Map<string, CBItem[]> = new Map();
+	callbacks:Map<string, Function> = new Map();
 	subscribers:SubscriberItemMap = new Map();
 	pending:Map<string, {method:string, cb:Function}> = new Map();
 
@@ -22,32 +22,27 @@ export class Client{
 			`[Kaspa gRPCProxy]:`
 		);
 
-		//const directFns = [
-		//	'onConnect', 'onDisconnect', 'onConnectFailure', 'onError'
-		//]
-
 		//seperate callback for direct function
 		this.core.on('rpc-direct', (msg:{rid:string, result:any})=>{
 			const {rid, result} = msg;
-			let items:CBItem[]|undefined = this.callbacks.get(rid);
-			if(!items)
+			let CB:Function|undefined = this.callbacks.get(rid);
+			this.log("rpc-direct", rid, result, CB)
+			if(!CB)
 				return
-			items.map(item=>item.cb(result));
+			CB(result);
 		})
 
-		this.core.on('rpc-result', (msg:{rid:string, result:any, error:any})=>{
+		this.core.on('rpc-response', (msg:{rid:string, result:any, error:any})=>{
 			const {rid, result, error} = msg;
 			let pending:{method:string, cb:Function}|undefined = this.pending.get(rid);
 			if(!pending)
 				return
 			pending.cb(error, result);
 			
-			//if(!directFns.includes(pending.method)){
-				this.pending.delete(rid);
-			//}
+			this.pending.delete(rid);
 		})
 
-		this.core.on('rpc-pub', (msg:{result:any, method:string})=>{
+		this.core.on('rpc-publish', (msg:{result:any, method:string})=>{
 			const {result, method} = msg;
 			let eventName = this.subject2EventName(method);
 			this.verbose && this.log("subscribe:eventName", eventName)
@@ -64,18 +59,12 @@ export class Client{
 
 	addCB(key:string, cb:Function){
 		let uid = UID();
-		let list:CBItem[]|undefined = this.callbacks.get(key);
-
-		if(!list){
-			list = [];
-			this.callbacks.set(key, list);
-		}
-		list.push({uid, cb});
+		this.callbacks.set(uid, cb);
 		return uid;
 	}
 
 	req(fn:string, args:any[], rid:string=''){
-		this.core.postMessage("rpc", {fn, args, rid})
+		this.core.postMessage("rpc-request", {fn, args, rid})
 	}
 
 	call(method:string, data:any={}){
@@ -89,29 +78,29 @@ export class Client{
 					resolve(result);
 				}
 			})
-			this.req('call', [method, data], rid);
+			this.req('request', [method, data], rid);
 		})
 	}
 
 	onConnect(callback:Function){
 		let rid = this.addCB("onConnect", callback);
-		this.req("onConnect", [{}], rid);
+		this.req("onConnect", [], rid);
 	}
 	onDisconnect(callback:Function){
 		let rid = this.addCB("onDisconnect", callback);
-		this.req("onDisconnect", [{}], rid);
+		this.req("onDisconnect", [], rid);
 	}
 	onConnectFailure(callback:Function){
 		let rid = this.addCB("onConnectFailure", callback);
-		this.req("onConnectFailure", [{}], rid);
+		this.req("onConnectFailure", [], rid);
 	}
 	onError(callback:Function){
 		let rid = this.addCB("onError", callback);
-		this.req("onError", [{}], rid);
+		this.req("onError", [], rid);
 	}
 
 	disconnect(){
-		this.req("disconnect", [{}]);
+		this.req("disconnect", []);
 	}
 
 	subscribe<T>(subject: string, data: any, callback: Function): Rpc.SubPromise<T>{

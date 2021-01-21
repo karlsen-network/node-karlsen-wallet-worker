@@ -35,7 +35,8 @@ export class EventEmitter{
 			fn(data);
 		})
 	}
-	postMessage(op:string, data:any){
+	postMessage(op:string, data:any={}){
+		//@ts-ignore
 		postMessage({op, data});
 	}
 }
