@@ -1,13 +1,51 @@
 //const threads = require('worker_threads');
-
 const Worker = require('web-worker');
+console.log("Worker", Worker)
+
+//@ts-ignore
+//let baseURL = (new URL("./", import.meta.url)).href;
+
 import {Wallet, EventTargetImpl, helper, log} from 'kaspa-wallet';
 import {UID, CBItem} from './rpc';
-
 const Url = require('url');
-const ISNODE = true;
 
-let baseURL = Url.pathToFileURL(__dirname + '/');//TODO
+const ISNODE = true;
+let worker:Worker, workerReady:helper.DeferredPromise = helper.Deferred();
+
+
+let onWorkerMessage = (op:string, data:any)=>{
+	log.info("abstract onWorkerMessage")
+}
+
+export const initKaspaFramework = ()=>{
+	return new Promise<void>((resolve, reject)=>{
+		helper.dpc(2000, ()=>{
+			//@ts-ignore
+			
+			let baseURL = 'file://'+__dirname+'/'//TODO
+			const url = new URL('worker.js', baseURL)
+			//const url = new URL('/node_modules/kaspa-wallet-worker/dist/lib/worker.js', window.location.origin);
+			console.log("ssssssss", url, baseURL, __dirname)
+			//return
+			try{
+				worker = new Worker(url, {type:'module'});
+			}catch(e){
+				console.log("Worker error", e)
+			}
+
+			worker.onmessage = (msg:{data:{op:string, data:any}})=>{
+				const {op, data} = msg.data;
+				if(op=='ready'){
+					workerReady.resolve();
+					resolve();
+					return
+				}
+				onWorkerMessage(op, data);
+			}
+		})
+	})
+}
+
 
 import {
 	Network, NetworkOptions, SelectedNetwork, WalletSave, Api, TxSend, TxResp,
@@ -15,10 +53,12 @@ import {
 } from 'kaspa-wallet/types/custom-types';
 
 class WalletWrapper extends EventTargetImpl{
-	
+
 	static networkTypes=Wallet.networkTypes;
 	static KSP=Wallet.KSP;
 	static networkAliases=Wallet.networkAliases;
+	static Mnemonic=Wallet.Mnemonic;
+
 	static fromMnemonic(seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}): WalletWrapper {
 		if (!networkOptions || !networkOptions.network)
 			throw new Error(`fromMnemonic(seedPhrase,networkOptions): missing network argument`);
@@ -33,7 +73,7 @@ class WalletWrapper extends EventTargetImpl{
 	rpc:IRPC|undefined;
 	_pendingCB:Map<string, CBItem> = new Map();
 	syncSignal:helper.DeferredPromise|undefined;
-	workerReady:helper.DeferredPromise = helper.Deferred();
+	workerReady:helper.DeferredPromise = workerReady;
 	balance:{available:number, pending:number, total:number} = {available:0, pending:0, total:0};
 	_rid2subUid:Map<string, string> = new Map();
 
@@ -67,14 +107,11 @@ class WalletWrapper extends EventTargetImpl{
 	}
 
 	initWorker(){
-		const url = new URL('./worker.js', baseURL);
-		const worker = this.worker = new Worker(url, {type:'module'});
-		worker.onmessage = (msg:{data:{op:string, data:any}})=>{
-			const {op, data} = msg.data;
+		if(!worker)
+			throw new Error("Please init kaspa framework using 'await initKaspaFramework();'.")
+		onWorkerMessage = (op:string, data:any)=>{
 			log.info(`worker message: ${op}, ${JSON.stringify(data)}`)
 			switch(op){
-				case 'ready':
-					return this.handleReady(data);
 				case 'rpc-request':
 					return this.handleRPCRequest(data);
 				case 'wallet-response':
@@ -92,10 +129,6 @@ class WalletWrapper extends EventTargetImpl{
 			this.balance = data;
 		}
 		this.emit(name, data);
-	}
-	handleReady(data:any=undefined){
-		this.workerReady.resolve()
-		this.emit("worker-ready");
 	}
 
 	async handleResponse(msg:{rid:string, error?:any, result?:any}){
