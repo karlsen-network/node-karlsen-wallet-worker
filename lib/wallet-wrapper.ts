@@ -1,5 +1,10 @@
 //const threads = require('worker_threads');
-const Worker = require('web-worker');
+let Worker_ = Worker;
+//@ts-ignore
+const IS_NODE_CLI = typeof window == 'undefined'
+
+if(IS_NODE_CLI)
+	Worker_ = require('web-worker');
 console.log("Worker", Worker)
 
 //@ts-ignore
@@ -9,7 +14,7 @@ import {Wallet, EventTargetImpl, helper, log} from 'kaspa-wallet';
 import {UID, CBItem} from './rpc';
 const Url = require('url');
 
-const ISNODE = true;
+
 let worker:Worker, workerReady:helper.DeferredPromise = helper.Deferred();
 
 
@@ -17,24 +22,36 @@ let onWorkerMessage = (op:string, data:any)=>{
 	log.info("abstract onWorkerMessage")
 }
 
-export const initKaspaFramework = ()=>{
+export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 	return new Promise<void>((resolve, reject)=>{
 		helper.dpc(2000, ()=>{
-			//@ts-ignore
 			
-			let baseURL = 'file://'+__dirname+'/'//TODO
-			const url = new URL('worker.js', baseURL)
-			//const url = new URL('/node_modules/kaspa-wallet-worker/dist/lib/worker.js', window.location.origin);
-			console.log("ssssssss", url, baseURL, __dirname)
+			
+			let url, baseURL;
+			if(IS_NODE_CLI){
+				baseURL = 'file://'+__dirname+'/'
+				url = new URL('worker.js', baseURL)
+			}
+			else{
+				baseURL = window.location.origin;
+				let {
+					workerPath="/node_modules/kaspa-wallet-worker/worker.js"
+				} = opt
+				url = new URL(workerPath, baseURL);
+			}
+			console.log("initKaspaFramework", url, baseURL)
 			//return
 			try{
-				worker = new Worker(url, {type:'module'});
+				worker = new Worker_(url, {type:'module'});
 			}catch(e){
 				console.log("Worker error", e)
 			}
 
+			console.log("worker instance created", worker)
+
 			worker.onmessage = (msg:{data:{op:string, data:any}})=>{
 				const {op, data} = msg.data;
+				console.log("worker.onmessage", op, data)
 				if(op=='ready'){
 					workerReady.resolve();
 					resolve();
@@ -65,6 +82,19 @@ class WalletWrapper extends EventTargetImpl{
 		const privKey = new Wallet.Mnemonic(seedPhrase.trim()).toHDPrivateKey().toString();
 		const wallet = new this(privKey, seedPhrase, networkOptions, options);
 		return wallet;
+	}
+
+	/**
+	 * Creates a new Wallet from encrypted wallet data.
+	 * @param password the password the user encrypted their seed phrase with
+	 * @param encryptedMnemonic the encrypted seed phrase from local storage
+	 * @throws Will throw "Incorrect password" if password is wrong
+	 */
+	static async import (password: string, encryptedMnemonic: string, networkOptions: NetworkOptions, options: WalletOptions = {}): Promise < WalletWrapper > {
+		const decrypted = await Wallet.passworder.decrypt(password, encryptedMnemonic);
+		const savedWallet = JSON.parse(decrypted) as WalletSave;
+		const myWallet = new this(savedWallet.privKey, savedWallet.seedPhrase, networkOptions, options);
+		return myWallet;
 	}
 
 	//@ts-ignore
@@ -109,6 +139,7 @@ class WalletWrapper extends EventTargetImpl{
 	initWorker(){
 		if(!worker)
 			throw new Error("Please init kaspa framework using 'await initKaspaFramework();'.")
+		this.worker = worker;
 		onWorkerMessage = (op:string, data:any)=>{
 			log.info(`worker message: ${op}, ${JSON.stringify(data)}`)
 			switch(op){
@@ -118,9 +149,16 @@ class WalletWrapper extends EventTargetImpl{
 					return this.handleResponse(data);
 				case 'wallet-events':
 					return this.handleEvents(data);
+				case 'wallet-property':
+					return this.handleProperty(data);
 			}
 
 		}
+	}
+
+	handleProperty(msg:{name:string, value:any}){
+		//@ts-ignore
+		this[name] = value;
 	}
 
 	handleEvents(msg:{name:string, data:any}){
@@ -266,6 +304,21 @@ class WalletWrapper extends EventTargetImpl{
 	submitTransaction(txParamsArg:TxSend, debug = false): Promise <TxResp|null> {
 		return new Promise((resolve, reject)=>{
 			this.request("submitTransaction", [txParamsArg, debug], (error:any, result:any)=>{
+				if(error)
+					return reject(error);
+				resolve(result);
+			})
+		})
+	}
+
+	/**
+	 * Generates encrypted wallet data.
+	 * @param password user's chosen password
+	 * @returns Promise that resolves to object-like string. Suggested to store as string for .import().
+	 */
+	export (password: string): Promise <string> {
+		return new Promise((resolve, reject)=>{
+			this.request("export", [password], (error:any, result:any)=>{
 				if(error)
 					return reject(error);
 				resolve(result);
