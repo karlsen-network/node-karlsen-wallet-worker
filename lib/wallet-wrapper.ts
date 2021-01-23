@@ -1,5 +1,3 @@
-//const threads = require('worker_threads');
-//let WebWorker = require('web-worker');
 //@ts-ignore
 const IS_NODE_CLI = typeof window == 'undefined';
 import {workerLog} from './logger';
@@ -12,7 +10,6 @@ workerLog.info("Worker:", (Worker_+"").substr(0, 32)+"....")
 
 
 import {UID, CBItem} from './rpc';
-const Url = require('url');
 
 
 let worker:Worker, workerReady:helper.DeferredPromise = helper.Deferred();
@@ -40,7 +37,7 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 				url = new URL(workerPath, baseURL);
 			}
 			workerLog.info("initKaspaFramework", url, baseURL)
-			//return
+
 			try{
 				worker = new Worker_(url, {type:'module'});
 			}catch(e){
