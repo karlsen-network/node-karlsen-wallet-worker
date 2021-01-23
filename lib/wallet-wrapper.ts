@@ -1,11 +1,10 @@
 //const threads = require('worker_threads');
-let Worker_ = Worker;
+//let WebWorker = require('web-worker');
 //@ts-ignore
 const IS_NODE_CLI = typeof window == 'undefined'
 
-if(IS_NODE_CLI)
-	Worker_ = require('web-worker');
-console.log("Worker", Worker)
+let Worker_ = IS_NODE_CLI?require('web-worker'):Worker;
+console.log("Worker", Worker_)
 
 //@ts-ignore
 //let baseURL = (new URL("./", import.meta.url)).href;
