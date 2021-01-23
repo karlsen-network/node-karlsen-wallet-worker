@@ -1,4 +1,5 @@
-import {Wallet as WalletImpl, initKaspaFramework, workerLog} from 'kaspa-wallet';
+import {workerLog} from './logger';
+import {Wallet as WalletImpl, initKaspaFramework} from 'kaspa-wallet';
 import {RPC, Client, IRPC} from './rpc';
 import {EventEmitter} from './event-emitter';
 export {workerLog}

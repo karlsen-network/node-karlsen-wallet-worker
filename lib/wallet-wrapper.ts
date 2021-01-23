@@ -2,7 +2,8 @@
 //let WebWorker = require('web-worker');
 //@ts-ignore
 const IS_NODE_CLI = typeof window == 'undefined';
-import {Wallet, EventTargetImpl, helper, workerLog} from 'kaspa-wallet';
+import {workerLog} from './logger';
+import {Wallet, EventTargetImpl, helper} from 'kaspa-wallet';
 
 export {workerLog};
 
