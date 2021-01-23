@@ -1,15 +1,15 @@
 //const threads = require('worker_threads');
 //let WebWorker = require('web-worker');
 //@ts-ignore
-const IS_NODE_CLI = typeof window == 'undefined'
+const IS_NODE_CLI = typeof window == 'undefined';
+import {Wallet, EventTargetImpl, helper, workerLog} from 'kaspa-wallet';
+
+export {workerLog};
 
 let Worker_ = IS_NODE_CLI?require('web-worker'):Worker;
-console.log("Worker", Worker_)
+workerLog.info("Worker:", (Worker_+"").substr(0, 32)+"....")
 
-//@ts-ignore
-//let baseURL = (new URL("./", import.meta.url)).href;
 
-import {Wallet, EventTargetImpl, helper, log} from 'kaspa-wallet';
 import {UID, CBItem} from './rpc';
 const Url = require('url');
 
@@ -18,7 +18,7 @@ let worker:Worker, workerReady:helper.DeferredPromise = helper.Deferred();
 
 
 let onWorkerMessage = (op:string, data:any)=>{
-	log.info("abstract onWorkerMessage")
+	workerLog.info("abstract onWorkerMessage")
 }
 
 export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
@@ -38,20 +38,20 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 				} = opt
 				url = new URL(workerPath, baseURL);
 			}
-			console.log("initKaspaFramework", url, baseURL)
+			workerLog.info("initKaspaFramework", url, baseURL)
 			//return
 			try{
 				worker = new Worker_(url, {type:'module'});
 			}catch(e){
-				console.log("Worker error", e)
+				workerLog.info("Worker error", e)
 			}
 
-			console.log("worker instance created", worker)
+			workerLog.info("worker instance created", worker+"")
 
 			worker.onmessage = (msg:{data:{op:string, data:any}})=>{
 				const {op, data} = msg.data;
-				console.log("worker.onmessage", op, data)
 				if(op=='ready'){
+					workerLog.info("worker.onmessage", op, data)
 					workerReady.resolve();
 					resolve();
 					return
@@ -74,6 +74,18 @@ class WalletWrapper extends EventTargetImpl{
 	static KSP=Wallet.KSP;
 	static networkAliases=Wallet.networkAliases;
 	static Mnemonic=Wallet.Mnemonic;
+
+	static async setWorkerLogLevel(level:string){
+		workerLog.setLevel(level);
+		await workerReady;
+		await this.postMessage('worker-log-level', {level});
+	}
+
+	static async postMessage(op:string, data:any){
+		workerLog.info(`postMessage:: ${op}, ${JSON.stringify(data)}`)
+		//@ts-ignore
+		worker.postMessage({op, data})
+	}
 
 	static fromMnemonic(seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}): WalletWrapper {
 		if (!networkOptions || !networkOptions.network)
@@ -140,7 +152,8 @@ class WalletWrapper extends EventTargetImpl{
 			throw new Error("Please init kaspa framework using 'await initKaspaFramework();'.")
 		this.worker = worker;
 		onWorkerMessage = (op:string, data:any)=>{
-			log.info(`worker message: ${op}, ${JSON.stringify(data)}`)
+			if(op != 'rpc-request')
+				workerLog.info(`onWorkerMessage: ${op}, ${JSON.stringify(data)}`)
 			switch(op){
 				case 'rpc-request':
 					return this.handleRPCRequest(data);
@@ -178,6 +191,7 @@ class WalletWrapper extends EventTargetImpl{
 		this._pendingCB.delete(rid);
 	}
 	async handleRPCRequest(msg:{fn:string, args:any, rid?:string}){
+		workerLog.debug(`RPCRequest: ${JSON.stringify(msg)}`)
 		const {fn, args, rid} = msg;
 
 		if(fn=="unSubscribe"){
@@ -230,9 +244,7 @@ class WalletWrapper extends EventTargetImpl{
 	}
 
 	postMessage(op:string, data:any){
-		log.info(`postMessage:: ${op}, ${JSON.stringify(data)}`)
-		//@ts-ignore
-		this.worker.postMessage({op, data})
+		WalletWrapper.postMessage(op, data)
 	}
 
 	async request(fn:string, args:any[], callback:Function|undefined=undefined){
@@ -241,7 +253,7 @@ class WalletWrapper extends EventTargetImpl{
 		if(callback){
 			rid = this.createPendingCall(callback)
 		}
-		log.info(`wallet-request: ${fn}, ${JSON.stringify(args)},  ${rid}`)
+		workerLog.debug(`wallet-request: ${fn}, ${JSON.stringify(args)},  ${rid}`)
 		this.worker.postMessage({op:"wallet-request", data:{fn, args, rid}})
 	}
 

@@ -1,5 +1,4 @@
-console.log("in worker")
-import {WorkerCore} from './worker-core';
+import {WorkerCore, workerLog} from './worker-core';
 let core = new WorkerCore();
-console.log("WorkerCore started", core)
+workerLog.info("WorkerCore started")
 

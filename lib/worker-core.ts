@@ -1,6 +1,7 @@
-import {Wallet as WalletImpl, initKaspaFramework, log} from 'kaspa-wallet';
+import {Wallet as WalletImpl, initKaspaFramework, workerLog} from 'kaspa-wallet';
 import {RPC, Client, IRPC} from './rpc';
 import {EventEmitter} from './event-emitter';
+export {workerLog}
 
 class Wallet extends WalletImpl{
 	emit(name:string, data:any={}){
@@ -26,19 +27,22 @@ export class WorkerCore extends EventEmitter{
 		super.init();
 		await initKaspaFramework();
 
-		this.postMessage("ready");
-
-		this.initWalletHanler();
 		addEventListener("message", (event)=>{
 			let {data:msg} = event;
 			let {op, data} = msg;
-			log.info(`worker got: ${op}, ${JSON.stringify(data)}`)
+			workerLog.info(`worker got: ${op}, ${JSON.stringify(data)}`)
 			if(!op)
 				return
 			this.emit(op, data);
 		})
+
+		this.postMessage("ready");
+		this.initWalletHanler();
 	}
 	initWalletHanler(){
+		this.on('worker-log-level', (msg:{level:string})=>{
+			workerLog.setLevel(msg.level)
+		})
 		this.on('wallet-init', (msg)=>{
 			const {
 				privKey,
@@ -49,8 +53,7 @@ export class WorkerCore extends EventEmitter{
 			networkOptions.rpc = this.rpc;
 
 			this.wallet = new Wallet(privKey, seedPhrase, networkOptions, options);
-			//log.info("core.wallet", this.wallet)
-
+			//workerLog.info("core.wallet", this.wallet)
 		})
 
 		this.on("wallet-request", async (msg:{fn:string, rid:string, args:any[]})=>{
@@ -78,7 +81,7 @@ export class WorkerCore extends EventEmitter{
 				}
 			}
 
-			log.debug(`wallet-request: ${fn} => ${func}`)
+			workerLog.debug(`wallet-request: ${fn} => ${func}`)
 
 			if(!func){
 				this.sendWalletResponse(rid, 
@@ -99,7 +102,7 @@ export class WorkerCore extends EventEmitter{
 			//@ts-ignore
 			let errorMsg = error?.message||error;
 
-			log.info(
+			workerLog.info(
 				`Sending Wallet Response: \n`+
 				`  FN: ${fn} \n`+
 				`  error: ${errorMsg} \n`+
