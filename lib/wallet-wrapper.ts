@@ -204,7 +204,8 @@ class WalletWrapper extends EventTargetImpl{
 		}
 
 		let directFns = [
-			'onConnect', 'onDisconnect', 'onConnectFailure', 'onError', 'disconnect'
+			'onConnect', 'onDisconnect', 'onConnectFailure', 'onError', 
+			'disconnect', 'connect'
 		];
 
 		if(directFns.includes(fn)){

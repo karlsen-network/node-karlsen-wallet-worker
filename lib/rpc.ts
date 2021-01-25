@@ -102,6 +102,9 @@ export class Client{
 	disconnect(){
 		this.req("disconnect", []);
 	}
+	connect(){
+		this.req("connect", []);
+	}
 
 	subscribe<T>(subject: string, data: any, callback: Function): Rpc.SubPromise<T>{
 		let eventName = this.subject2EventName(subject);
@@ -161,6 +164,9 @@ export class RPC implements IRPC{
 	}
 	disconnect(){
 		this.client?.disconnect();
+	}
+	async connect(){
+		return this.client?.connect();
 	}
 	unSubscribe(method:string, uid:string=''){
 		return this.client.unSubscribe(method, uid);
