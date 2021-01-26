@@ -1,5 +1,6 @@
 import {workerLog} from './logger';
 import {Wallet as WalletImpl, initKaspaFramework} from 'kaspa-wallet';
+import {TxSend, TxInfo} from'kaspa-wallet/types/custom-types';
 import {RPC, Client, IRPC} from './rpc';
 import {EventEmitter} from './event-emitter';
 export {workerLog}
@@ -111,6 +112,16 @@ export class WorkerCore extends EventEmitter{
 			)
 			this.sendWalletResponse(rid, error, result);
 		})
+	}
+
+	async estimateTransaction(txParamsArg: TxSend): Promise < TxInfo|null > {
+		if(!this.wallet)
+			return null;
+		let data = await this.wallet.estimateTransaction(txParamsArg)
+		delete data.tx;
+		delete data.rawTx;
+		delete data.utxos;
+		return data;
 	}
 
 	sendWalletResponse(rid:string, error:any=undefined, result:any=undefined){

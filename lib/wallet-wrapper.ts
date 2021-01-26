@@ -63,7 +63,7 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 
 import {
 	Network, NetworkOptions, SelectedNetwork, WalletSave, Api, TxSend, TxResp,
-	PendingTransactions, WalletCache, IRPC, RPC, WalletOptions,	WalletOpt
+	PendingTransactions, WalletCache, IRPC, RPC, WalletOptions,	WalletOpt, TxInfo
 } from 'kaspa-wallet/types/custom-types';
 
 class WalletWrapper extends EventTargetImpl{
@@ -314,6 +314,24 @@ class WalletWrapper extends EventTargetImpl{
 	submitTransaction(txParamsArg:TxSend, debug = false): Promise <TxResp|null> {
 		return new Promise((resolve, reject)=>{
 			this.request("submitTransaction", [txParamsArg, debug], (error:any, result:any)=>{
+				if(error)
+					return reject(error);
+				resolve(result);
+			})
+		})
+	}
+
+	/**
+	 * Send a transaction. Returns transaction id.
+	 * @param txParams
+	 * @param txParams.toAddr To address in cashaddr format (e.g. kaspatest:qq0d6h0prjm5mpdld5pncst3adu0yam6xch4tr69k2)
+	 * @param txParams.amount Amount to send in yonis (100000000 (1e8) yonis in 1 KSP)
+	 * @param txParams.fee Fee for miners in yonis
+	 * @throws `FetchError` if endpoint is down. API error message if tx error. Error if amount is too large to be represented as a javascript number.
+	 */
+	estimateTransaction(txParamsArg:TxSend): Promise<TxInfo>{
+		return new Promise((resolve, reject)=>{
+			this.request("estimateTransaction", [txParamsArg], (error:any, result:any)=>{
 				if(error)
 					return reject(error);
 				resolve(result);
