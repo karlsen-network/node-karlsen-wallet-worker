@@ -11,7 +11,7 @@
     "prepare": "npm run build"
   },
   "dependencies": {
-    "@aspectron/flow-logger": ">=0.0.7",
+    "@aspectron/flow-logger": ">=1.0.0",
     "@types/node": "^14.14.9",
     "kaspa-wallet": "aspectron/kaspa-wallet",
     "web-worker": "aspectron/web-worker",
