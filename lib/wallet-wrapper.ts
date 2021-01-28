@@ -72,6 +72,17 @@ class WalletWrapper extends EventTargetImpl{
 	static KSP=Wallet.KSP;
 	static networkAliases=Wallet.networkAliases;
 	static Mnemonic=Wallet.Mnemonic;
+	static passwordHandler=Wallet.passworder;
+
+	static async checkPasswordValidity(password:string, encryptedMnemonic: string){
+		try{
+			const decrypted = await this.passwordHandler.decrypt(password, encryptedMnemonic);
+			const savedWallet = JSON.parse(decrypted) as WalletSave;
+			return !!savedWallet?.privKey;
+		}catch(e){
+			return false;
+		}
+	}
 
 	static async setWorkerLogLevel(level:string){
 		workerLog.setLevel(level);
