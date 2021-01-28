@@ -57,6 +57,12 @@ export class Client{
 		})
 	}
 
+	cleanup(){
+		this.callbacks.clear();
+		this.subscribers.clear();
+		this.pending.clear();
+	}
+
 	addCB(key:string, cb:Function){
 		let uid = UID();
 		this.callbacks.set(uid, cb);
@@ -147,6 +153,9 @@ export class Client{
 
 export class RPC implements IRPC{
 	client:Client;
+	cleanup(){
+		this.client.cleanup();
+	}
 	constructor(options:any={}){
 		this.client = options.client;
 	}

@@ -46,6 +46,8 @@ export class WorkerCore extends EventEmitter{
 			workerLog.setLevel(msg.level)
 		})
 		this.on('wallet-init', (msg)=>{
+			//@ts-ignore
+			this.rpc.cleanup();
 			const {
 				privKey,
 				seedPhrase,
