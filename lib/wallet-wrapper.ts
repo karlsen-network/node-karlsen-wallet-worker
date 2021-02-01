@@ -69,7 +69,7 @@ import {
 class WalletWrapper extends EventTargetImpl{
 
 	static networkTypes=Wallet.networkTypes;
-	static KSP=Wallet.KSP;
+	static KAS=Wallet.KAS;
 	static networkAliases=Wallet.networkAliases;
 	static Mnemonic=Wallet.Mnemonic;
 	static passwordHandler=Wallet.passworder;
@@ -318,8 +318,8 @@ class WalletWrapper extends EventTargetImpl{
 	 * Send a transaction. Returns transaction id.
 	 * @param txParams
 	 * @param txParams.toAddr To address in cashaddr format (e.g. kaspatest:qq0d6h0prjm5mpdld5pncst3adu0yam6xch4tr69k2)
-	 * @param txParams.amount Amount to send in yonis (100000000 (1e8) yonis in 1 KSP)
-	 * @param txParams.fee Fee for miners in yonis
+	 * @param txParams.amount Amount to send in sompis (100000000 (1e8) sompis in 1 KAS)
+	 * @param txParams.fee Fee for miners in sompis
 	 * @throws `FetchError` if endpoint is down. API error message if tx error. Error if amount is too large to be represented as a javascript number.
 	 */
 	submitTransaction(txParamsArg:TxSend, debug = false): Promise <TxResp|null> {
@@ -336,8 +336,8 @@ class WalletWrapper extends EventTargetImpl{
 	 * Send a transaction. Returns transaction id.
 	 * @param txParams
 	 * @param txParams.toAddr To address in cashaddr format (e.g. kaspatest:qq0d6h0prjm5mpdld5pncst3adu0yam6xch4tr69k2)
-	 * @param txParams.amount Amount to send in yonis (100000000 (1e8) yonis in 1 KSP)
-	 * @param txParams.fee Fee for miners in yonis
+	 * @param txParams.amount Amount to send in sompis (100000000 (1e8) sompis in 1 KAS)
+	 * @param txParams.fee Fee for miners in sompis
 	 * @throws `FetchError` if endpoint is down. API error message if tx error. Error if amount is too large to be represented as a javascript number.
 	 */
 	estimateTransaction(txParamsArg:TxSend): Promise<TxInfo>{
