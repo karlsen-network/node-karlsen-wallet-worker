@@ -72,7 +72,7 @@ class WalletWrapper extends EventTargetImpl{
 	static KAS=Wallet.KAS;
 	static networkAliases=Wallet.networkAliases;
 	static Mnemonic=Wallet.Mnemonic;
-	static passwordHandler=Wallet.passworder;
+	static passwordHandler=Wallet.passwordHandler;
 
 	static async checkPasswordValidity(password:string, encryptedMnemonic: string){
 		try{
