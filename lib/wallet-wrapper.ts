@@ -111,7 +111,7 @@ class WalletWrapper extends EventTargetImpl{
 	 * @throws Will throw "Incorrect password" if password is wrong
 	 */
 	static async import (password: string, encryptedMnemonic: string, networkOptions: NetworkOptions, options: WalletOptions = {}): Promise < WalletWrapper > {
-		const decrypted = await Wallet.passworder.decrypt(password, encryptedMnemonic);
+		const decrypted = await Wallet.passwordHandler.decrypt(password, encryptedMnemonic);
 		const savedWallet = JSON.parse(decrypted) as WalletSave;
 		const myWallet = new this(savedWallet.privKey, savedWallet.seedPhrase, networkOptions, options);
 		return myWallet;
