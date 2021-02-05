@@ -72,11 +72,11 @@ class WalletWrapper extends EventTargetImpl{
 	static KAS=Wallet.KAS;
 	static networkAliases=Wallet.networkAliases;
 	static Mnemonic=Wallet.Mnemonic;
-	static passwordHandler=Wallet.passwordHandler;
+	static Crypto=Wallet.Crypto;
 
 	static async checkPasswordValidity(password:string, encryptedMnemonic: string){
 		try{
-			const decrypted = await this.passwordHandler.decrypt(password, encryptedMnemonic);
+			const decrypted = await this.Crypto.decrypt(password, encryptedMnemonic);
 			const savedWallet = JSON.parse(decrypted) as WalletSave;
 			return !!savedWallet?.privKey;
 		}catch(e){
