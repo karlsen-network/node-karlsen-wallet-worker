@@ -13,22 +13,24 @@ class Wallet extends WalletImpl{
 	}
 }
 
-
 export class WorkerCore extends EventEmitter{
 	rpc:IRPC;
 	wallet:Wallet|undefined;
 
 	constructor(){
+		workerLog.debug("WorkerCore:constructor1")
 		super();
-
 		this.rpc = new RPC({
 			client: new Client(this)
 		})
+		workerLog.debug("WorkerCore:constructor2")
 	}
 	async init(){
+		workerLog.debug("WorkerCore:init")
 		super.init();
+		workerLog.debug("before initKaspaFramework")
 		await initKaspaFramework();
-
+		workerLog.debug("after initKaspaFramework")
 		addEventListener("message", (event)=>{
 			let {data:msg} = event;
 			let {op, data} = msg;
