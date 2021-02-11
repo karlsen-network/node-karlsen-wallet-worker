@@ -1,7 +1,7 @@
 //@ts-ignore
 const IS_NODE_CLI = typeof window == 'undefined';
 import {workerLog} from './logger';
-import {Wallet, EventTargetImpl, helper} from 'kaspa-wallet';
+import {Wallet, EventTargetImpl, helper} from '@kaspa/wallet';
 
 export {workerLog};
 

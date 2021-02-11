@@ -1,6 +1,6 @@
 export * from 'kaspa-wallet/types/rpc';
 
-import {RPC} from 'kaspa-wallet/types/rpc';
+import {RPC} from '@kaspa/wallet/types/rpc';
 
 export interface SubscriberItem{
   uid:string;
