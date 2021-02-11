@@ -1,21 +1,31 @@
 {
   "name": "@kaspa/wallet-worker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Worker (node + browser) wrapping kaspa-wallet",
   "main": "dist/index.js",
   "author": "Kaspa Developers",
   "license": "ISC",
   "scripts": {
     "watch": "tsc --watch",
-    "_prepare": "npm run build",
     "prepublishOnly": "rm -rf ./dist && tsc"
   },
   "dependencies": {
     "@aspectron/flow-logger": ">=1.0.1",
-    "@types/node": "^14.14.9",
     "@kaspa/wallet": "*",
-    "@aspectron/web-worker": "^1.0.0",
+    "@aspectron/web-worker": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "*",
     "ts-node": "^9.0.0",
-    "typescript": "*"
-  }
+    "@types/node": "^14.14.9"
+  },
+  "files": [
+    "dist",
+    "lib",
+    "types",
+    "index.ts",
+    "README.md",
+    "tsconfig.json",
+    "worker.js"
+  ]
 }
