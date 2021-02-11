@@ -7,15 +7,25 @@
   "license": "ISC",
   "scripts": {
     "watch": "tsc --watch",
-    "prepare": "npm run build",
     "prepublishOnly": "rm -rf ./dist && tsc"
   },
   "dependencies": {
     "@aspectron/flow-logger": ">=1.0.1",
-    "@types/node": "^14.14.9",
     "@kaspa/wallet": "*",
-    "@aspectron/web-worker": "^1.0.0",
+    "@aspectron/web-worker": "^1.0.0"
+  },
+  "devDependencies": {
+    "typescript": "*",
     "ts-node": "^9.0.0",
-    "typescript": "*"
-  }
+    "@types/node": "^14.14.9"
+  },
+  "files": [
+    "dist",
+    "lib",
+    "types",
+    "index.ts",
+    "README.md",
+    "tsconfig.json",
+    "worker.js"
+  ]
 }
