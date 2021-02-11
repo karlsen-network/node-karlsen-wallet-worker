@@ -1,4 +1,4 @@
-export * from 'kaspa-wallet/types/rpc';
+export * from '@kaspa/wallet/types/rpc';
 
 import {RPC} from '@kaspa/wallet/types/rpc';
 
