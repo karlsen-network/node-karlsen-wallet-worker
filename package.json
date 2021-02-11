@@ -1,13 +1,13 @@
 {
   "name": "@kaspa/wallet-worker",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Worker (node + browser) wrapping kaspa-wallet",
   "main": "dist/index.js",
   "author": "Kaspa Developers",
   "license": "ISC",
   "scripts": {
     "watch": "tsc --watch",
-    "prepublishOnly": "rm -rf ./dist && npm install --also=dev && tsc"
+    "prepublishOnly": "rm -rf ./dist && rm -f package-lock.json && npm install --also=dev && tsc"
   },
   "dependencies": {
     "@aspectron/flow-logger": ">=1.0.1",
