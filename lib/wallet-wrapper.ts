@@ -5,7 +5,7 @@ import {Wallet, EventTargetImpl, helper} from 'kaspa-wallet';
 
 export {workerLog};
 
-let Worker_ = IS_NODE_CLI?require('web-worker'):Worker;
+let Worker_ = IS_NODE_CLI?require('@aspectron/web-worker'):Worker;
 workerLog.info("Worker:", (Worker_+"").substr(0, 32)+"....")
 
 

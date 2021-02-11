@@ -1,4 +1,4 @@
-declare module "web-worker" {
+declare module "@aspectron/web-worker" {
     import { EventEmitter } from "events";
     import { Readable, Writable } from "stream";
     import { URL } from "url";
