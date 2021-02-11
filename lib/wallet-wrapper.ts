@@ -64,7 +64,7 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 import {
 	Network, NetworkOptions, SelectedNetwork, WalletSave, Api, TxSend, TxResp,
 	PendingTransactions, WalletCache, IRPC, RPC, WalletOptions,	WalletOpt, TxInfo
-} from 'kaspa-wallet/types/custom-types';
+} from '@kaspa/wallet/types/custom-types';
 
 class WalletWrapper extends EventTargetImpl{
 
