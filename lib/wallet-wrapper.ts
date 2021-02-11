@@ -1,7 +1,7 @@
 //@ts-ignore
 const IS_NODE_CLI = typeof window == 'undefined';
 import {workerLog} from './logger';
-import {Wallet, EventTargetImpl, helper} from 'kaspa-wallet';
+import {Wallet, EventTargetImpl, helper} from '@kaspa/wallet';
 
 export {workerLog};
 
@@ -64,7 +64,7 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 import {
 	Network, NetworkOptions, SelectedNetwork, WalletSave, Api, TxSend, TxResp,
 	PendingTransactions, WalletCache, IRPC, RPC, WalletOptions,	WalletOpt, TxInfo
-} from 'kaspa-wallet/types/custom-types';
+} from '@kaspa/wallet/types/custom-types';
 
 class WalletWrapper extends EventTargetImpl{
 
