@@ -66,7 +66,7 @@ export class WorkerCore extends EventEmitter{
 			let {fn, rid, args} = msg;
 			let {wallet} = this;
 			if(!wallet)
-				return this.sendWalletResponse(rid, "Wallet not initilized yet.");
+				return this.sendWalletResponse(rid, `Wallet not initilized yet. (subject:${fn})`);
 			if(!fn)
 				return this.sendWalletResponse(rid, "Invalid wallet request.");
 
