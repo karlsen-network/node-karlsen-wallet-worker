@@ -32,7 +32,7 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 			else{
 				baseURL = window.location.origin;
 				let {
-					workerPath="/node_modules/kaspa-wallet-worker/worker.js"
+					workerPath="/node_modules/@kaspa/wallet-worker/worker.js"
 				} = opt
 				url = new URL(workerPath, baseURL);
 			}
