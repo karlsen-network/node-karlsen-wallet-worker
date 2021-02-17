@@ -1,7 +1,8 @@
 //@ts-ignore
 const IS_NODE_CLI = typeof window == 'undefined';
 import {workerLog} from './logger';
-import {Wallet, EventTargetImpl, helper} from '@kaspa/wallet';
+import {Wallet, EventTargetImpl, helper, kaspacore} from '@kaspa/wallet';
+const {HDPrivateKey} = kaspacore;
 
 export {workerLog};
 
@@ -126,6 +127,8 @@ class WalletWrapper extends EventTargetImpl{
 	workerReady:helper.DeferredPromise = workerReady;
 	balance:{available:number, pending:number, total:number} = {available:0, pending:0, total:0};
 	_rid2subUid:Map<string, string> = new Map();
+	uid:string;
+	HDWallet: kaspacore.HDPrivateKey;
 
 	constructor(privKey: string, seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}){
 		super();
@@ -141,9 +144,29 @@ class WalletWrapper extends EventTargetImpl{
 			*/
 		}
 		delete networkOptions.rpc;
+
+		if (privKey && seedPhrase) {
+			this.HDWallet = new kaspacore.HDPrivateKey(privKey);
+		} else {
+			const temp = new Wallet.Mnemonic(Wallet.Mnemonic.Words.ENGLISH);
+			this.HDWallet = new kaspacore.HDPrivateKey(temp.toHDPrivateKey().toString());
+		}
+
+		this.uid = this.createUID(networkOptions.network);
+		//@ts-ignore
+		rpc?.setStreamUid?.(this.uid);
+		console.log("wallet.uid", this.uid)
+
+
 		this.initWorker();
 
 		this.initWallet(privKey, seedPhrase, networkOptions, options);
+	}
+
+	createUID(network:string){
+		const {privateKey} = this.HDWallet.deriveChild(`m/44'/972/0'/1'/0'`);
+		let address = privateKey.toAddress(network).toString().split(":")[1]
+		return helper.sha256(address);
 	}
 
 	async initWallet(privKey: string, seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}){
