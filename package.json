@@ -1,6 +1,6 @@
 {
   "name": "@kaspa/wallet-worker",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Worker (node + browser) wrapping kaspa-wallet",
   "main": "dist/index.js",
   "author": "Kaspa Developers",
@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@aspectron/flow-logger": ">=1.0.1",
-    "@kaspa/wallet": ">=0.0.8",
+    "@kaspa/wallet": ">=0.0.10",
     "@aspectron/web-worker": "^1.0.0"
   },
   "devDependencies": {
