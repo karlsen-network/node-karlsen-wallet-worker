@@ -34,7 +34,7 @@ export class WorkerCore extends EventEmitter{
 		addEventListener("message", (event)=>{
 			let {data:msg} = event;
 			let {op, data} = msg;
-			workerLog.info(`worker got: ${op}, ${JSON.stringify(data)}`)
+			workerLog.info(`worker op: ${op}, ${JSON.stringify(data)}`)
 			if(!op)
 				return
 			this.emit(op, data);
