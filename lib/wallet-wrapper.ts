@@ -124,11 +124,13 @@ class WalletWrapper extends EventTargetImpl{
 	rpc:IRPC|undefined;
 	_pendingCB:Map<string, CBItem> = new Map();
 	syncSignal:helper.DeferredPromise|undefined;
+	grpcFlagsSyncSignal:helper.DeferredPromise|undefined;
 	workerReady:helper.DeferredPromise = workerReady;
 	balance:{available:number, pending:number, total:number} = {available:0, pending:0, total:0};
 	_rid2subUid:Map<string, string> = new Map();
 	uid:string;
 	HDWallet: kaspacore.HDPrivateKey;
+	grpcFlags:{utxoIndex?:Boolean} = {};
 
 	constructor(privKey: string, seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}){
 		super();
@@ -136,12 +138,9 @@ class WalletWrapper extends EventTargetImpl{
 		let {rpc} = networkOptions;
 		if(rpc){
 			this.rpc = rpc;
-			/*
-			console.log("#####rpc onConnect check#######")
-			rpc.onConnect(()=>{
-				console.log("#####rpc onConnect#######")
-			})
-			*/
+			if(options.checkGRPCFlags){
+				this.checkGRPCFlags();
+			}
 		}
 		delete networkOptions.rpc;
 
@@ -161,6 +160,27 @@ class WalletWrapper extends EventTargetImpl{
 		this.initWorker();
 
 		this.initWallet(privKey, seedPhrase, networkOptions, options);
+	}
+
+	checkGRPCFlags(){
+		const {rpc} = this;
+		if(!rpc)
+			return
+		this.grpcFlagsSyncSignal = helper.Deferred();
+		rpc.onConnect(async()=>{
+			//console.log("#####rpc onConnect#######")
+			let result = await rpc.getUtxosByAddresses([])
+			.catch((err)=>{
+				//error = err;
+			})
+
+			if(result){
+				this.grpcFlags.utxoIndex = !result.error?.message?.includes('--utxoindex');
+				this.emit("grpc-flags", this.grpcFlags)
+			}
+
+			this.grpcFlagsSyncSignal?.resolve();
+		})
 	}
 
 	createUID(network:string){
@@ -225,6 +245,29 @@ class WalletWrapper extends EventTargetImpl{
 	async handleRPCRequest(msg:{fn:string, args:any, rid?:string}){
 		workerLog.debug(`RPCRequest: ${JSON.stringify(msg)}`)
 		const {fn, args, rid} = msg;
+
+
+		const utxoRelatedFns = [
+			'notifyUtxosChangedRequest',
+			'getUtxosByAddressesRequest',
+			'stopNotifyingUtxosChangedRequest'
+		];
+		//console.log("fnfn", fn, args[0])
+		if(args[0] && utxoRelatedFns.includes(args[0])){
+			await this.grpcFlagsSyncSignal;
+			if(!this.grpcFlags.utxoIndex){
+				this.postMessage("rpc-response", {
+					rid,
+					result:{
+						error:{
+							errorCode:"UTXOINDEX-FLAG-MISSING",
+							message:"UTXOINDEX FLAG ISSUE"
+						}
+					}
+				})
+				return;
+			}
+		}
 
 		if(fn=="unSubscribe"){
 			if(args[1]){
