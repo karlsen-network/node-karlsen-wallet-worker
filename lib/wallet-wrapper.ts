@@ -64,7 +64,8 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 
 import {
 	Network, NetworkOptions, SelectedNetwork, WalletSave, Api, TxSend, TxResp,
-	PendingTransactions, WalletCache, IRPC, RPC, WalletOptions,	WalletOpt, TxInfo
+	PendingTransactions, WalletCache, IRPC, RPC, WalletOptions,	WalletOpt, TxInfo,
+	TxCompoundOptions
 } from '@kaspa/wallet/types/custom-types';
 
 class WalletWrapper extends EventTargetImpl{
@@ -333,6 +334,16 @@ class WalletWrapper extends EventTargetImpl{
 		this.worker.postMessage({op:"wallet-request", data:{fn, args, rid}})
 	}
 
+	requestPromisify<T>(fn:string, ...args:any[]):Promise<T>{
+		return new Promise((resolve, reject)=>{
+			this.request(fn, args, (error:any, result:any)=>{
+				if(error)
+					return reject(error);
+				resolve(result);
+			})
+		})
+	}
+
 	createPendingCall(cb:Function):string{
 		const uid = UID();
 		this._pendingCB.set(uid, {uid, cb});
@@ -389,13 +400,7 @@ class WalletWrapper extends EventTargetImpl{
 	 * @throws `FetchError` if endpoint is down. API error message if tx error. Error if amount is too large to be represented as a javascript number.
 	 */
 	submitTransaction(txParamsArg:TxSend, debug = false): Promise <TxResp|null> {
-		return new Promise((resolve, reject)=>{
-			this.request("submitTransaction", [txParamsArg, debug], (error:any, result:any)=>{
-				if(error)
-					return reject(error);
-				resolve(result);
-			})
-		})
+		return this.requestPromisify<TxResp|null>("submitTransaction", txParamsArg, debug)
 	}
 
 	/**
@@ -407,13 +412,14 @@ class WalletWrapper extends EventTargetImpl{
 	 * @throws `FetchError` if endpoint is down. API error message if tx error. Error if amount is too large to be represented as a javascript number.
 	 */
 	estimateTransaction(txParamsArg:TxSend): Promise<TxInfo>{
-		return new Promise((resolve, reject)=>{
-			this.request("estimateTransaction", [txParamsArg], (error:any, result:any)=>{
-				if(error)
-					return reject(error);
-				resolve(result);
-			})
-		})
+		return this.requestPromisify<TxInfo>("estimateTransaction", txParamsArg)
+	}
+
+	/*
+	* Compound UTXOs by re-sending funds to itself
+	*/	
+	compoundUTXOs(txCompoundOptions:TxCompoundOptions={}, debug=false): Promise <TxResp|null> {
+		return this.requestPromisify<TxResp|null>("compoundUTXOs", txCompoundOptions, debug);
 	}
 
 	/**
@@ -422,16 +428,8 @@ class WalletWrapper extends EventTargetImpl{
 	 * @returns Promise that resolves to object-like string. Suggested to store as string for .import().
 	 */
 	export (password: string): Promise <string> {
-		return new Promise((resolve, reject)=>{
-			this.request("export", [password], (error:any, result:any)=>{
-				if(error)
-					return reject(error);
-				resolve(result);
-			})
-		})
+		return this.requestPromisify<string>("export", password)
 	}
-
-	
 }
 
 
