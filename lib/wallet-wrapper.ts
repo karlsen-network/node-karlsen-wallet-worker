@@ -254,7 +254,7 @@ class WalletWrapper extends EventTargetImpl{
 			'stopNotifyingUtxosChangedRequest'
 		];
 		//console.log("fnfn", fn, args[0])
-		if(args[0] && utxoRelatedFns.includes(args[0])){
+		if(args[0] && utxoRelatedFns.includes(args[0]) && this.grpcFlagsSyncSignal){
 			await this.grpcFlagsSyncSignal;
 			if(!this.grpcFlags.utxoIndex){
 				this.postMessage("rpc-response", {
