@@ -430,6 +430,13 @@ class WalletWrapper extends EventTargetImpl{
 	export (password: string): Promise <string> {
 		return this.requestPromisify<string>("export", password)
 	}
+
+	restoreCache(cache: WalletCache){
+		this.request("restoreCache", [cache])
+	}
+	clearUsedUTXOs(){
+		this.request("clearUsedUTXOs", [])
+	}
 }
 
 
