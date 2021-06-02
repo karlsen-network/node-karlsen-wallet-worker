@@ -223,4 +223,11 @@ export class RPC implements IRPC{
 	getVirtualSelectedParentBlueScore(){
 		return this.request<Rpc.VirtualSelectedParentBlueScoreResponse>('getVirtualSelectedParentBlueScoreRequest', {});
 	}
+
+	getBlockDagInfo(){
+		return this.request<Rpc.GetBlockDagInfoResponse>('getBlockDagInfoRequest', {});
+	}
+	subscribeVirtualDaaScoreChanged(callback:Rpc.callback<Rpc.VirtualDaaScoreChangedNotification>){
+		return this.subscribe<Rpc.NotifyVirtualDaaScoreChangedResponse, Rpc.VirtualDaaScoreChangedNotification>("notifyVirtualDaaScoreChangedRequest", {}, callback);
+	}
 }
