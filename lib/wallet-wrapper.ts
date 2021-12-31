@@ -65,7 +65,7 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 import {
 	Network, NetworkOptions, SelectedNetwork, WalletSave, Api, TxSend, TxResp,
 	PendingTransactions, WalletCache, IRPC, RPC, WalletOptions,	WalletOpt, TxInfo,
-	TxCompoundOptions
+	TxCompoundOptions, ScaneMoreResult
 } from '@kaspa/wallet/types/custom-types';
 
 class WalletWrapper extends EventTargetImpl{
@@ -415,11 +415,15 @@ class WalletWrapper extends EventTargetImpl{
 		return this.requestPromisify<TxInfo>("estimateTransaction", txParamsArg)
 	}
 
-	/*
+	/**
 	* Compound UTXOs by re-sending funds to itself
 	*/	
 	compoundUTXOs(txCompoundOptions:TxCompoundOptions={}, debug=false): Promise <TxResp|null> {
 		return this.requestPromisify<TxResp|null>("compoundUTXOs", txCompoundOptions, debug);
+	}
+
+	scanMoreAddresses(count=100, debug=false, receiveStart=-1, changeStart=-1): Promise<ScaneMoreResult|null>{
+		return this.requestPromisify<ScaneMoreResult|null>("scanMoreAddresses", count, debug, receiveStart, changeStart);
 	}
 
 	/**
