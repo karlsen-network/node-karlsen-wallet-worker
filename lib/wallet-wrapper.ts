@@ -1,10 +1,10 @@
 //@ts-ignore
 const IS_NODE_CLI = typeof window == 'undefined';
 import {workerLog} from './logger';
-import {Wallet, EventTargetImpl, helper, kaspacore, CONFIRMATION_COUNT} from '@kaspa/wallet';
+import {Wallet, EventTargetImpl, helper, kaspacore, CONFIRMATION_COUNT, COINBASE_CFM_COUNT} from '@kaspa/wallet';
 const {HDPrivateKey} = kaspacore;
 
-export {workerLog, CONFIRMATION_COUNT};
+export {workerLog, CONFIRMATION_COUNT, COINBASE_CFM_COUNT};
 
 let Worker_ = IS_NODE_CLI?require('@aspectron/web-worker'):Worker;
 workerLog.info("Worker:", (Worker_+"").substr(0, 32)+"....")
