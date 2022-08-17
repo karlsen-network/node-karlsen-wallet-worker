@@ -12,7 +12,7 @@
   "dependencies": {
     "@aspectron/flow-logger": ">=1.0.1",
     "@aspectron/web-worker": "^1.0.0",
-    "@kaspa/wallet": ">=1.4.19"
+    "@kaspa/wallet": ">=1.4.20"
   },
   "devDependencies": {
     "@types/node": "^14.14.9",
