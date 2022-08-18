@@ -367,6 +367,10 @@ class WalletWrapper extends EventTargetImpl{
 		this.request("setLogLevel", [level])
 	}
 
+	startUTXOsPolling(){
+		this.request("startUTXOsPolling", []);
+	}
+
 	get(name:string, waitForSync:boolean=false){
 		return new Promise(async(resolve, reject)=>{
 			if(waitForSync)
