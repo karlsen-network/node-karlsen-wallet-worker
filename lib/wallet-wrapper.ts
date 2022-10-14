@@ -93,7 +93,9 @@ class WalletWrapper extends EventTargetImpl{
 	}
 
 	static async postMessage(op:string, data:any){
-		workerLog.info(`postMessage:: ${op}, ${JSON.stringify(data)}`)
+		if (op!="wallet-init"){
+			workerLog.info(`postMessage:: ${op}, ${JSON.stringify(data)}`)
+		}
 		//@ts-ignore
 		worker.postMessage({op, data})
 	}
