@@ -422,6 +422,13 @@ class WalletWrapper extends EventTargetImpl{
 	}
 
 	/**
+	 * Update transcations time
+	 */
+	startUpdatingTransactions(version:undefined|number=undefined):Promise<boolean>{
+		return this.requestPromisify<boolean>("startUpdatingTransactions", version)
+	}
+
+	/**
 	* Compound UTXOs by re-sending funds to itself
 	*/	
 	compoundUTXOs(txCompoundOptions:TxCompoundOptions={}, debug=false): Promise <TxResp|null> {
