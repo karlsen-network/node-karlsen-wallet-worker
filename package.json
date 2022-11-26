@@ -1,6 +1,6 @@
 {
   "name": "@kaspa/wallet-worker",
-  "version": "1.1.21",
+  "version": "1.1.22",
   "description": "Worker (node + browser) wrapping kaspa-wallet",
   "main": "dist/index.js",
   "author": "Kaspa Developers",
