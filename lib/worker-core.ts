@@ -34,7 +34,9 @@ export class WorkerCore extends EventEmitter{
 		addEventListener("message", (event)=>{
 			let {data:msg} = event;
 			let {op, data} = msg;
-			workerLog.info(`worker op: ${op}, ${JSON.stringify(data)}`)
+			if (op != "wallet-init"){
+				workerLog.info(`worker op: ${op}, ${JSON.stringify(data)}`)
+			}
 			if(!op)
 				return
 			this.emit(op, data);
