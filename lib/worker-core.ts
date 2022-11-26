@@ -109,13 +109,14 @@ export class WorkerCore extends EventEmitter{
 
 			//@ts-ignore
 			let errorMsg = error?.message||error;
-
-			workerLog.info(
-				`Sending Wallet Response: \n`+
-				`  FN: ${fn} \n`+
-				`  error: ${errorMsg} \n`+
-				`  result: ${JSON.stringify(result)} \n`
-			)
+			if (fn != "mnemonic"){
+				workerLog.info(
+					`Sending Wallet Response: \n`+
+					`  FN: ${fn} \n`+
+					`  error: ${errorMsg} \n`+
+					`  result: ${JSON.stringify(result)} \n`
+				)
+			}
 			this.sendWalletResponse(rid, error, result);
 		})
 	}
