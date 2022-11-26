@@ -117,7 +117,7 @@ export class WorkerCore extends EventEmitter{
 					`  result: ${JSON.stringify(result)} \n`
 				)
 			}
-			this.sendWalletResponse(rid, error, result);
+			this.sendWalletResponse(rid, error, result, fn);
 		})
 	}
 
@@ -131,7 +131,7 @@ export class WorkerCore extends EventEmitter{
 		return data;
 	}
 
-	sendWalletResponse(rid:string, error:any=undefined, result:any=undefined){
-		this.postMessage("wallet-response", {rid, error, result});
+	sendWalletResponse(rid:string, error:any=undefined, result:any=undefined, fn:string|undefined=undefined){
+		this.postMessage("wallet-response", {rid, fn, error, result});
 	}
 }

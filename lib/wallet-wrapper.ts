@@ -207,8 +207,11 @@ class WalletWrapper extends EventTargetImpl{
 			throw new Error("Please init kaspa framework using 'await initKaspaFramework();'.")
 		this.worker = worker;
 		onWorkerMessage = (op:string, data:any)=>{
-			if(op != 'rpc-request')
-				workerLog.info(`onWorkerMessage: ${op}, ${JSON.stringify(data)}`)
+			//if(op != 'rpc-request'){
+				//if (data?.fn != "mnemonic"){
+					//workerLog.info(`onWorkerMessage: ${op}, ${JSON.stringify(data)}`)
+				//}
+			//}
 			switch(op){
 				case 'rpc-request':
 					return this.handleRPCRequest(data);
