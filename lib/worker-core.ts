@@ -1,6 +1,6 @@
 import {workerLog} from './logger';
-import {Wallet as WalletImpl, initKaspaFramework} from '@kaspa/wallet';
-import {TxSend, TxInfo} from '@kaspa/wallet/types/custom-types';
+import {Wallet as WalletImpl, initKarlsenFramework} from '@karlsen/wallet';
+import {TxSend, TxInfo} from '@karlsen/wallet/types/custom-types';
 import {RPC, Client, IRPC} from './rpc';
 import {EventEmitter} from './event-emitter';
 export {workerLog}
@@ -28,9 +28,9 @@ export class WorkerCore extends EventEmitter{
 	async init(){
 		workerLog.debug("WorkerCore:init")
 		super.init();
-		workerLog.debug("before initKaspaFramework")
-		await initKaspaFramework();
-		workerLog.debug("after initKaspaFramework")
+		workerLog.debug("before initKarlsenFramework")
+		await initKarlsenFramework();
+		workerLog.debug("after initKarlsenFramework")
 		addEventListener("message", (event)=>{
 			let {data:msg} = event;
 			let {op, data} = msg;

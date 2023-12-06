@@ -19,7 +19,7 @@ export class Client{
 		this.log = Function.prototype.bind.call(
 			console.log,
 			console,
-			`[Kaspa gRPCProxy]:`
+			`[Karlsen gRPCProxy]:`
 		);
 
 		//seperate callback for direct function
