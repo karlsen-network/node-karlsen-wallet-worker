@@ -3,7 +3,7 @@
 Karlsen Wallet implements Wallet functionality for the [Karlsen Network](https://github.com/karlsen-network/karlsend)
 
 Karlsen Wallet is implemented in TypeScript and can be used server-side
-(NodeJs) and client-side (browser)
+(NodeJs) and client-side (browser).
 
 **PLEASE NOTE: This project is under heavy development**
 
@@ -224,7 +224,7 @@ Wallet retains 2 types of balances:
 * *available* - balance contains KLS ready to be spent, comprised of
   UTXO records with block maturity blue score over 100.
 * *pending* - balance contains newly received transactions with UTXO
-  block maturity less than 100.  Upon each UTXO maturity balance is
+  block maturity less than 100. Upon each UTXO maturity balance is
   relocated from pending to available.
 
 `Wallet::balance` is an object containing the following properties that
