@@ -1,9 +1,16 @@
 {
-  "name": "@kaspa/wallet-worker",
+  "name": "@karlsen/wallet-worker",
   "version": "1.1.25",
-  "description": "Worker (node + browser) wrapping kaspa-wallet",
+  "description": "Worker (node + browser) wrapping karlsen-wallet",
   "main": "dist/index.js",
-  "author": "Kaspa Developers",
+  "authors": [
+    {
+      "name": "Kaspa Developers"
+    },
+    {
+      "name": "Karlsen Developers"
+    }
+  ],
   "license": "ISC",
   "scripts": {
     "watch": "tsc --watch",
@@ -12,7 +19,7 @@
   "dependencies": {
     "@aspectron/flow-logger": ">=1.0.1",
     "@aspectron/web-worker": "^1.0.0",
-    "@kaspa/wallet": "file:../node-karlsen-wallet"
+    "@karlsen/wallet": "file:../node-karlsen-wallet"
   },
   "devDependencies": {
     "@types/node": "^14.14.9",

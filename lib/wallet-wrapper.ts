@@ -1,8 +1,8 @@
 //@ts-ignore
 const IS_NODE_CLI = typeof window == 'undefined';
 import {workerLog} from './logger';
-import {Wallet, EventTargetImpl, helper, kaspacore, CONFIRMATION_COUNT, COINBASE_CFM_COUNT} from '@kaspa/wallet';
-const {HDPrivateKey} = kaspacore;
+import {Wallet, EventTargetImpl, helper, karlsencore, CONFIRMATION_COUNT, COINBASE_CFM_COUNT} from '@karlsen/wallet';
+const {HDPrivateKey} = karlsencore;
 
 export {workerLog, CONFIRMATION_COUNT, COINBASE_CFM_COUNT};
 
@@ -20,7 +20,7 @@ let onWorkerMessage = (op:string, data:any)=>{
 	workerLog.info("abstract onWorkerMessage")
 }
 
-export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
+export const initKarlsenFramework = (opt:{workerPath?:string}={})=>{
 	return new Promise<void>((resolve, reject)=>{
 		helper.dpc(2000, ()=>{
 			
@@ -33,11 +33,11 @@ export const initKaspaFramework = (opt:{workerPath?:string}={})=>{
 			else{
 				baseURL = window.location.origin;
 				let {
-					workerPath="/node_modules/@kaspa/wallet-worker/worker.js"
+					workerPath="/node_modules/@karlsen/wallet-worker/worker.js"
 				} = opt
 				url = new URL(workerPath, baseURL);
 			}
-			workerLog.info("initKaspaFramework", url, baseURL)
+			workerLog.info("initKarlsenFramework", url, baseURL)
 
 			try{
 				worker = new Worker_(url, {type:'module'});
@@ -66,12 +66,12 @@ import {
 	Network, NetworkOptions, SelectedNetwork, WalletSave, Api, TxSend, TxResp,
 	PendingTransactions, WalletCache, IRPC, RPC, WalletOptions,	WalletOpt, TxInfo,
 	TxCompoundOptions, ScaneMoreResult
-} from '@kaspa/wallet/types/custom-types';
+} from '@karlsen/wallet/types/custom-types';
 
 class WalletWrapper extends EventTargetImpl{
 
 	static networkTypes=Wallet.networkTypes;
-	static KAS=Wallet.KAS;
+	static KLS=Wallet.KLS;
 	static networkAliases=Wallet.networkAliases;
 	static Mnemonic=Wallet.Mnemonic;
 	static Crypto=Wallet.Crypto;
@@ -132,7 +132,7 @@ class WalletWrapper extends EventTargetImpl{
 	balance:{available:number, pending:number, total:number} = {available:0, pending:0, total:0};
 	_rid2subUid:Map<string, string> = new Map();
 	uid:string;
-	HDWallet: kaspacore.HDPrivateKey;
+	HDWallet: karlsencore.HDPrivateKey;
 	grpcFlags:{utxoIndex?:Boolean} = {};
 
 	constructor(privKey: string, seedPhrase: string, networkOptions: NetworkOptions, options: WalletOptions = {}){
@@ -148,10 +148,10 @@ class WalletWrapper extends EventTargetImpl{
 		delete networkOptions.rpc;
 
 		if (privKey && seedPhrase) {
-			this.HDWallet = new kaspacore.HDPrivateKey(privKey);
+			this.HDWallet = new karlsencore.HDPrivateKey(privKey);
 		} else {
 			const temp = new Wallet.Mnemonic(Wallet.Mnemonic.Words.ENGLISH);
-			this.HDWallet = new kaspacore.HDPrivateKey(temp.toHDPrivateKey().toString());
+			this.HDWallet = new karlsencore.HDPrivateKey(temp.toHDPrivateKey().toString());
 		}
 
 		this.uid = this.createUID(networkOptions.network);
@@ -204,7 +204,7 @@ class WalletWrapper extends EventTargetImpl{
 
 	initWorker(){
 		if(!worker)
-			throw new Error("Please init kaspa framework using 'await initKaspaFramework();'.")
+			throw new Error("Please init karlsen framework using 'await initKarlsenFramework();'.")
 		this.worker = worker;
 		onWorkerMessage = (op:string, data:any)=>{
 			//if(op != 'rpc-request'){
@@ -403,8 +403,8 @@ class WalletWrapper extends EventTargetImpl{
 	/**
 	 * Send a transaction. Returns transaction id.
 	 * @param txParams
-	 * @param txParams.toAddr To address in cashaddr format (e.g. kaspatest:qq0d6h0prjm5mpdld5pncst3adu0yam6xch4tr69k2)
-	 * @param txParams.amount Amount to send in sompis (100000000 (1e8) sompis in 1 KAS)
+	 * @param txParams.toAddr To address in cashaddr format (e.g. karlsentest:qq0d6h0prjm5mpdld5pncst3adu0yam6xch4tr69k2)
+	 * @param txParams.amount Amount to send in sompis (100000000 (1e8) sompis in 1 KLS)
 	 * @param txParams.fee Fee for miners in sompis
 	 * @throws `FetchError` if endpoint is down. API error message if tx error. Error if amount is too large to be represented as a javascript number.
 	 */
@@ -415,8 +415,8 @@ class WalletWrapper extends EventTargetImpl{
 	/**
 	 * Send a transaction. Returns transaction id.
 	 * @param txParams
-	 * @param txParams.toAddr To address in cashaddr format (e.g. kaspatest:qq0d6h0prjm5mpdld5pncst3adu0yam6xch4tr69k2)
-	 * @param txParams.amount Amount to send in sompis (100000000 (1e8) sompis in 1 KAS)
+	 * @param txParams.toAddr To address in cashaddr format (e.g. karlsentest:qq0d6h0prjm5mpdld5pncst3adu0yam6xch4tr69k2)
+	 * @param txParams.amount Amount to send in sompis (100000000 (1e8) sompis in 1 KLS)
 	 * @param txParams.fee Fee for miners in sompis
 	 * @throws `FetchError` if endpoint is down. API error message if tx error. Error if amount is too large to be represented as a javascript number.
 	 */
