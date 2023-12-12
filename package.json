@@ -19,7 +19,7 @@
   "dependencies": {
     "@aspectron/flow-logger": ">=1.0.1",
     "@aspectron/web-worker": "^1.0.0",
-    "@karlsen/wallet": "file:../node-karlsen-wallet"
+    "@karlsen/wallet": ">=1.4.26"
   },
   "devDependencies": {
     "@types/node": "^14.14.9",
